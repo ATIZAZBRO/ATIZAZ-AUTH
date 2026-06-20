@@ -10,7 +10,8 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace AtizazAuth
 {
@@ -225,8 +226,48 @@ namespace AtizazAuth
         private APIResponse DeserializeResponse(string json)
         {
             try {
-                return JsonConvert.DeserializeObject<APIResponse>(json);
-            } catch {
+                var node = JsonNode.Parse(json);
+                if (node == null) return null;
+
+                var res = new APIResponse();
+                
+                var sucNode = node["success"];
+                res.success = sucNode != null ? sucNode.GetValue<bool>() : false;
+                
+                var msgNode = node["message"];
+                res.message = msgNode != null ? msgNode.GetValue<string>() : null;
+                
+                var userNode = node["username"];
+                res.username = userNode != null ? userNode.GetValue<string>() : null;
+                
+                var subNode = node["subscription"];
+                res.subscription = subNode != null ? subNode.GetValue<string>() : null;
+                
+                var expNode = node["expiry"];
+                res.expiry = expNode != null ? expNode.GetValue<string>() : null;
+                
+                var svNode = node["serverVersion"];
+                res.serverVersion = svNode != null ? svNode.GetValue<string>() : null;
+                
+                var valNode = node["value"];
+                res.value = valNode != null ? valNode.GetValue<string>() : null;
+                
+                var sesNode = node["sessionid"];
+                res.sessionid = sesNode != null ? sesNode.GetValue<string>() : null;
+                
+                var varsNode = node["variables"];
+                if (varsNode != null && varsNode is JsonObject obj)
+                {
+                    res.variables = new Dictionary<string, string>();
+                    foreach (var kvp in obj)
+                    {
+                        res.variables[kvp.Key] = kvp.Value != null ? kvp.Value.GetValue<string>() : null;
+                    }
+                }
+                
+                return res;
+            } catch (Exception ex) {
+                System.Windows.Forms.MessageBox.Show("JSON Parse Error: " + ex.Message + "\nRaw JSON: " + json);
                 return null;
             }
         }
