@@ -17,8 +17,8 @@ namespace ATIZAZ_AUTH_CSharp_EXAMPLE
      
         public static AtizazAuthAPI api = new AtizazAuthAPI(
             apiUrl: "https://cmatizaz-cfire.atizazfayaz78.workers.dev",
-            secretKey: "", 
-            applicationName: "",
+            secretKey: "ENTER SCRET", 
+            applicationName: "ENTER NAME",
             version: "1.0"
         );
 
