@@ -9,8 +9,8 @@ def main():
     
     api = AtizazAuthAPI(
         api_url="https://cmatizaz-cfire.atizazfayaz78.workers.dev",
-        secret_key="ATIZAZ-4XOG3LQSUY8", 
-        application_name="ATIZAZ AUTH",
+        secret_key="XXXXXXXXX", 
+        application_name="XXXXXXX",
         version="1.0"
     )
     
