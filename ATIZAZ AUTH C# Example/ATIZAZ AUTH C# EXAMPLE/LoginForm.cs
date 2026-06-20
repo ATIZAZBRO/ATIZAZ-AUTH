@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-using Atizaz_Auth;
+using AtizazAuth;
 
 namespace ATIZAZ_AUTH_CSharp_EXAMPLE
 {
