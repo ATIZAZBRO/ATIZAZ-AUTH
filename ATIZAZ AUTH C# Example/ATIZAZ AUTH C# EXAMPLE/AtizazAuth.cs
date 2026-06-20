@@ -11,7 +11,7 @@ using System.Threading;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 
-namespace Atizaz_Auth
+namespace AtizazAuth
 {
     public class AtizazAuthAPI
     {
