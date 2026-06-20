@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
+using Newtonsoft.Json;
 
 namespace AtizazAuth
 {
@@ -32,7 +33,7 @@ namespace AtizazAuth
         private readonly string applicationName;
         private readonly string version;
         private readonly HttpClient client;
-        
+
         private string sessionid = "";
         private string seed = "";
         private bool initialized = false;
@@ -78,7 +79,7 @@ namespace AtizazAuth
             {
                 while (true)
                 {
-                    Thread.Sleep(60000); 
+                    Thread.Sleep(60000);
                     ushort foundAtom = GlobalFindAtom(seed);
                     if (foundAtom == 0)
                     {
@@ -102,7 +103,7 @@ namespace AtizazAuth
             CheckAtom();
 
             string hash = Checksum(Process.GetCurrentProcess().MainModule.FileName);
-            
+
             var payload = new Dictionary<string, string>
             {
                 {"secret", this.secretKey},
@@ -111,7 +112,7 @@ namespace AtizazAuth
                 {"hash", hash}
             };
 
-            try 
+            try
             {
                 // Task.Run prevents UI thread deadlock
                 var response = Task.Run(() => Req("init", payload, false)).GetAwaiter().GetResult();
@@ -165,7 +166,7 @@ namespace AtizazAuth
                 }
 
                 string successStr = responseObj.success ? "1" : "0";
-                
+
                 string variableLines = "";
                 if (responseObj.variables != null)
                 {
@@ -223,16 +224,18 @@ namespace AtizazAuth
 
         private APIResponse DeserializeResponse(string json)
         {
-            var ms = new MemoryStream(Encoding.UTF8.GetBytes(json));
-            var serializer = new DataContractJsonSerializer(typeof(APIResponse));
-            return (APIResponse)serializer.ReadObject(ms);
+            try {
+                return JsonConvert.DeserializeObject<APIResponse>(json);
+            } catch {
+                return null;
+            }
         }
 
         private async Task<APIResponse> Req(string endpoint, Dictionary<string, string> payloadDict, bool secure = true)
         {
             string requestNonce = Guid.NewGuid().ToString("N");
             string clientTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
-            
+
             if (secure)
             {
                 payloadDict["clientNonce"] = requestNonce;
@@ -320,28 +323,28 @@ namespace AtizazAuth
     {
         [DataMember(Name = "success")]
         public bool success { get; set; }
-        
+
         [DataMember(Name = "message")]
         public string message { get; set; }
-        
+
         [DataMember(Name = "username")]
         public string username { get; set; }
-        
+
         [DataMember(Name = "subscription")]
         public string subscription { get; set; }
-        
+
         [DataMember(Name = "expiry")]
         public string expiry { get; set; }
-        
+
         [DataMember(Name = "serverVersion")]
         public string serverVersion { get; set; }
-        
+
         [DataMember(Name = "value")]
         public string value { get; set; }
-        
+
         [DataMember(Name = "variables")]
         public Dictionary<string, string> variables { get; set; }
-        
+
         [DataMember(Name = "sessionid")]
         public string sessionid { get; set; }
     }
